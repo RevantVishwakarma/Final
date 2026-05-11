@@ -1076,9 +1076,25 @@ app.get("/search", requireAuth, (req, res) => {
 
       if (err) {
 
+        if (err.code === "ER_BAD_FIELD_ERROR") {
+
+          logError("SEARCH_SCHEMA", err, { hint: "Check yii_book.oldbookid column" });
+
+          return res.status(500).json({
+
+            success: false,
+
+            message: "Database schema mismatch: oldbookid column not found",
+
+          });
+
+        }
+
         return sendSilentError(res, 500, "SEARCH", err);
 
       }
+
+      console.log(`[SEARCH] term="${term}" results=${results.length}`);
 
       return res.json({
 
@@ -1101,6 +1117,18 @@ app.get("/books", requireAuth, (req, res) => {
   const page = parseInt(req.query.page) || 1;
 
   const limit = Math.min(parseInt(req.query.limit) || 20, 100);
+
+  if (Number.isNaN(page) || page < 1) {
+
+    return res.status(400).json({ success: false, message: "Invalid page value" });
+
+  }
+
+  if (Number.isNaN(limit) || limit < 1) {
+
+    return res.status(400).json({ success: false, message: "Invalid limit value" });
+
+  }
 
   const offset = (page - 1) * limit;
 
@@ -1140,9 +1168,25 @@ app.get("/books", requireAuth, (req, res) => {
 
       if (err) {
 
+        if (err.code === "ER_BAD_FIELD_ERROR") {
+
+          logError("BOOKS_SCHEMA", err, { hint: "Check yii_book.oldbookid column" });
+
+          return res.status(500).json({
+
+            success: false,
+
+            message: "Database schema mismatch: oldbookid column not found",
+
+          });
+
+        }
+
         return sendSilentError(res, 500, "BOOKS", err);
 
       }
+
+      console.log(`[BOOKS] page=${page} limit=${limit} results=${results.length}`);
 
       return res.json({
 

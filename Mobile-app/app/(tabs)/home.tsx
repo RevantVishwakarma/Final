@@ -121,7 +121,8 @@ export default function Home() {
       const data = res.data;
 
       if (data.success && Array.isArray(data.data)) {
-        setSuggestions(data.data.slice(0, 10));
+        const cleaned = data.data.map((item: Book) => ({ ...item, oldbookid: item.oldbookid ?? null }));
+        setSuggestions(cleaned.slice(0, 10));
         if (data.data.length === 0) {
           setError(`No books found for "${query.trim()}".`);
         }
@@ -136,7 +137,8 @@ export default function Home() {
         return;
       }
       setSuggestions([]);
-      setError("Cannot connect to server.");
+      console.error("[HOME_SEARCH_ERROR]", err);
+      setError("Cannot connect to server. Please check your internet or server status.");
     } finally {
       setLoading(false);
     }
@@ -146,7 +148,12 @@ export default function Home() {
     setResult(book);
     setSuggestions([]);
     setSearch(book.bookname);
-    setError("");
+    if (book.oldbookid === null || book.oldbookid === undefined || `${book.oldbookid}`.trim() === "") {
+      console.warn("[HOME_BOOK_WARNING] Missing oldbookid for selected book", book.bookname);
+      setError("Old Book ID is not available for this record.");
+    } else {
+      setError("");
+    }
     saveRecent(book.bookname);
     setCopied(false);
 
@@ -178,9 +185,15 @@ export default function Home() {
 
   const copyShelf = async () => {
     if (!result) return;
-    await Clipboard.setStringAsync(result.bookshelf);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await Clipboard.setStringAsync(result.bookshelf);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (copyError) {
+      console.error("[HOME_COPY_SHELF_ERROR]", copyError);
+      setError("Unable to copy shelf location right now.");
+      setCopied(false);
+    }
   };
 
   const tintBg = mode === "dark" ? "rgba(77,182,172,0.12)" : "rgba(0,121,107,0.08)";
