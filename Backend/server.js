@@ -1048,6 +1048,8 @@ app.get("/search", requireAuth, (req, res) => {
 
       bookshelf,
 
+      oldbookid,
+
       subject
 
     FROM yii_book
@@ -1115,6 +1117,8 @@ app.get("/books", requireAuth, (req, res) => {
       bookpublisher,
 
       bookshelf,
+
+      oldbookid,
 
       subject
 

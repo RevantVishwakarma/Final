@@ -34,6 +34,7 @@ type Book = {
   bookauthor: string;
   bookpublisher: string;
   bookshelf: string;
+  oldbookid?: string | number | null;
   subject: string;
 };
 
@@ -345,6 +346,17 @@ export default function Home() {
               <View style={{ flex: 1 }}>
                 <Text style={[styles.infoLabel, { color: theme.icon }]}>Publisher</Text>
                 <Text style={[styles.infoValue, { color: theme.text }]}>{result.bookpublisher}</Text>
+              </View>
+            </View>
+
+
+            <View style={styles.infoRow}>
+              <View style={[styles.infoIcon, { backgroundColor: theme.background }]}>
+                <Ionicons name="pricetag-outline" size={15} color={theme.tint} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.infoLabel, { color: theme.icon }]}>Old Book ID</Text>
+                <Text style={[styles.infoValue, { color: theme.text }]}>{result.oldbookid ?? "-"}</Text>
               </View>
             </View>
 
